@@ -17,11 +17,11 @@ class SpaceKernel(Kernel):
         # )
 
         self.register_parameter(
-            name="raw_gauss_mean", parameter=torch.nn.Parameter(torch.ones(1,1)*-2)
+            name="raw_gauss_mean", parameter=torch.nn.Parameter(torch.ones(1,1)*-1.5)
         )
 
         self.register_parameter(
-            name="raw_gauss_sig", parameter=torch.nn.Parameter(torch.ones(1, 1)*-3)
+            name="raw_gauss_sig", parameter=torch.nn.Parameter(torch.ones(1, 1)*-3.5)
         )
 
         self.A_scale = A_scale
