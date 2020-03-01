@@ -17,7 +17,7 @@ class SpaceKernel(Kernel):
         # )
 
         self.register_parameter(
-            name="raw_gauss_mean", parameter=torch.nn.Parameter(torch.ones(1,1)*-1.5)
+            name="raw_gauss_mean", parameter=torch.nn.Parameter(torch.ones(1,1)*-2.5)
         )
 
         self.register_parameter(
