@@ -10,6 +10,7 @@ import os, sys
 sys.path.append("../")
 from kernels import SpaceKernel
 from torch.nn.functional import softplus
+import pandas as pd
 
 
 class GPModel(gpytorch.models.ApproximateGP):
@@ -17,7 +18,7 @@ class GPModel(gpytorch.models.ApproximateGP):
         self.name_prefix = name_prefix
         self.dim = inducing_pts.shape[-1]
         self.edge_len = edge_len
-        self.mean_intensity = num_arrivals / (edge_len ** dim)
+        self.mean_intensity = num_arrivals / (edge_len ** self.dim)
         num_inducing = inducing_pts.shape[0]
 
         # Define the variational distribution and strategy of the GP
@@ -168,8 +169,8 @@ def main():
         model.train()
         for i in range(num_iter):
             loss = infer.step(train_pts, inducing_pts)
-            loader.set_postfix(loss=loss)
 
+            print(model.covar_module.raw_gauss_mean)
             if i % 25 == 0:
                 print("iter = ", i)
 
@@ -206,6 +207,6 @@ def main():
 
     plt.savefig("./learned_covariance.pdf", bbox_inches="tight")
 
-    
+
 if __name__ == '__main__':
     main()
