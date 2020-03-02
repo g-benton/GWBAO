@@ -122,6 +122,7 @@ def main():
 
     use_cuda = torch.cuda.is_available()
     if use_cuda:
+        torch.set_default_tensor_type(torch.cuda.FloatTensor)
         inducing_pts = inducing_pts.cuda()
         model = model.cuda()
 
@@ -129,7 +130,7 @@ def main():
     ## GENERATE DATA ##
     ###################
     Ndraw = 8000
-    rs = np.cbrt(0.74**3*torch.rand(Ndraw).numpy())
+    rs = np.cbrt(0.74**3*torch.rand(Ndraw).cpu().numpy())
 
     cos_thetas = np.random.uniform(low=-1, high=1, size=Ndraw)
     sin_thetas = np.sqrt(1-cos_thetas*cos_thetas)
@@ -143,7 +144,7 @@ def main():
 
     sample_intensity = model(torch.tensor(pts).float()).sample(sample_shape=torch.Size((1,))).squeeze()
     sample_intensity = sample_intensity.div(sample_intensity.max())
-    pts = pts[torch.rand(Ndraw) < sample_intensity, :]
+    pts = pts[torch.rand(Ndraw).cpu() < sample_intensity.cpu(), :]
     print('Drew {:d}'.format(pts.shape[0]))
 
     pts = pd.DataFrame(data=pts, columns=['x', 'y', 'z'])
@@ -154,7 +155,7 @@ def main():
     model.covar_module = SpaceKernel()
 
     import os
-    num_iter = 250
+    num_iter = 1000
     num_particles = 32
 
     train_pts = torch.tensor(pts.values).float()
@@ -187,6 +188,7 @@ def main():
     ## PLOTTING ##
     ##############
 
+    tau = torch.linspace(0, 0.3)
     base_kern = SpaceKernel()
     true_kern = SpaceKernel()
     true_kern.raw_gauss_mean.data = raw_r_bao
@@ -196,17 +198,16 @@ def main():
     base_cov = base_kern(tau, torch.zeros(1,1)).evaluate()
     true_cov = true_kern(tau, torch.zeros(1,1)).evaluate()
 
-    plt.plot(tau, learn_cov.detach(), label="learned")
-    plt.plot(tau, base_cov.detach(), label="initial")
-    plt.plot(tau, true_cov.detach(), label="truth")
+    plt.plot(tau.cpu(), learn_cov.detach().cpu(), label="learned")
+    plt.plot(tau.cpu(), base_cov.detach().cpu(), label="initial")
+    plt.plot(tau.cpu(), true_cov.detach().cpu(), label="truth")
     plt.yscale("log")
     plt.legend()
     plt.title("(Log) GP Covariance for Cox Process")
     plt.xlabel(r"$\tau$")
     plt.ylabel("Log Covariance")
-
     plt.savefig("./learned_covariance.pdf", bbox_inches="tight")
-
+                                        
 
 if __name__ == '__main__':
     main()
