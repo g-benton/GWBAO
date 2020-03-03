@@ -129,7 +129,7 @@ def main():
     ###################
     ## GENERATE DATA ##
     ###################
-    Ndraw = 8000
+    Ndraw = 12000
     rs = np.cbrt(0.74**3*torch.rand(Ndraw).cpu().numpy())
 
     cos_thetas = np.random.uniform(low=-1, high=1, size=Ndraw)
