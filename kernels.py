@@ -9,6 +9,7 @@ from torch.nn.functional import softplus
 
 
 class SpaceKernel(Kernel):
+    is_stationary = True
     def __init__(self, A_scale=-1.8, **kwargs):
         super(SpaceKernel, self).__init__(**kwargs)
 
@@ -31,11 +32,18 @@ class SpaceKernel(Kernel):
 
 
 
+
+
     def forward(self, x1, x2=None, diag=False, last_dim_is_batch=False,
         **kwargs):
 
+
         x1_ = x1
         x2_ = x1 if x2 is None else x2
+
+        # print(x1.shape)
+        # print(x2.shape)
+        # print("\n")
         if last_dim_is_batch:
             x1_ = x1_.transpose(-1, -2).unsqueeze(-1)
             x2_ = x2_.transpose(-1, -2).unsqueeze(-1)
